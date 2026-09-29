@@ -1641,6 +1641,41 @@ input, select, textarea {
   color: var(--text-muted);
 }
 
+.thumbnail-item[draggable="true"] {
+  cursor: grab;
+}
+
+.thumbnail-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.thumbnail-item.dragging {
+  opacity: 0.4;
+}
+
+.thumbnail-item.drag-over-target {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.thumbnail-order-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
 /* Multi-file Merge List */
 .merge-files-list {
   display: flex;

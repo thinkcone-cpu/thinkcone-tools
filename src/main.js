@@ -54,8 +54,7 @@ const state = {
     rotateScope: 'all',
     // organize
     pageOrder: [],
-    // pdf-to-jpg
-    imgFormat: 'jpg',
+    // pdf-to-jpg / pdf-to-png
     imgScale: 1.5,
     // jpg-to-pdf
     orientation: 'portrait',
@@ -321,6 +320,7 @@ function renderApp() {
             <a class="footer-link" data-footer-tool="png-to-jpg">PNG to JPG Converter</a>
             <a class="footer-link" data-footer-tool="jpg-to-png">JPG to PNG Converter</a>
             <a class="footer-link" data-footer-tool="pdf-to-jpg">PDF to JPG Extraction</a>
+            <a class="footer-link" data-footer-tool="pdf-to-png">PDF to PNG Extraction</a>
             <a class="footer-link" data-footer-tool="jpg-to-pdf">JPG to PDF</a>
             <a class="footer-link" data-footer-tool="pdf-to-text">PDF to Unicode Text</a>
           </div>
@@ -1114,7 +1114,10 @@ function renderStudioStageContent(tool) {
         ${state.thumbnails
           .map(
             (thumb, idx) => `
-          <div class="thumbnail-item" data-thumb-page="${thumb.pageNumber}">
+          <div class="thumbnail-item" data-thumb-page="${thumb.pageNumber}" ${
+              tool.id === 'organize' ? `data-thumb-idx="${idx}" draggable="true"` : ''
+            }>
+            ${tool.id === 'organize' ? `<div class="thumbnail-order-badge">${idx + 1}</div>` : ''}
             <div class="thumbnail-img-wrap">
               <img src="${thumb.dataUrl}" alt="Page ${thumb.pageNumber}" />
             </div>
@@ -1122,9 +1125,21 @@ function renderStudioStageContent(tool) {
               <span class="page-badge">Page ${thumb.pageNumber}</span>
               ${
                 tool.id === 'organize'
-                  ? `<button class="icon-btn delete" data-delete-page="${idx}" title="Remove page" style="width: 24px; height: 24px;">
-                       <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
-                     </button>`
+                  ? `<div style="display: flex; gap: 4px;">
+                       <button class="icon-btn" data-move-page-up="${idx}" title="Move earlier" ${
+                         idx === 0 ? 'disabled style="opacity: 0.3;"' : ''
+                       } style="width: 24px; height: 24px;">
+                         <i data-lucide="arrow-up" style="width: 12px; height: 12px;"></i>
+                       </button>
+                       <button class="icon-btn" data-move-page-down="${idx}" title="Move later" ${
+                         idx === state.thumbnails.length - 1 ? 'disabled style="opacity: 0.3;"' : ''
+                       } style="width: 24px; height: 24px;">
+                         <i data-lucide="arrow-down" style="width: 12px; height: 12px;"></i>
+                       </button>
+                       <button class="icon-btn delete" data-delete-page="${idx}" title="Remove page" style="width: 24px; height: 24px;">
+                         <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+                       </button>
+                     </div>`
                   : ''
               }
             </div>
@@ -1281,7 +1296,7 @@ function renderToolSpecificControls(tool, opts) {
       return `
         <div class="form-group">
           <span class="form-label">Interactive Page Grid</span>
-          <p class="form-sublabel">Delete unwanted pages directly from the preview grid on the left. The remaining pages will be packaged in sequence.</p>
+          <p class="form-sublabel">Drag any page thumbnail to move it, or use the arrow buttons to shift it earlier or later. The numbered badge shows its new position. Delete unwanted pages with the trash icon.</p>
         </div>
       `;
 
@@ -1289,9 +1304,27 @@ function renderToolSpecificControls(tool, opts) {
       return `
         <div class="form-group">
           <label class="form-label">Image Format</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <button class="btn-outline ${opts.imgFormat === 'jpg' ? 'active' : ''}" data-set-opt="imgFormat" data-opt-val="jpg" style="padding: 10px;">JPG</button>
-            <button class="btn-outline ${opts.imgFormat === 'png' ? 'active' : ''}" data-set-opt="imgFormat" data-opt-val="png" style="padding: 10px;">PNG</button>
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 2px solid #0284c7; border-radius: var(--radius-md); background: rgba(2, 132, 199, 0.1); font-weight: 700; font-size: 0.85rem; color: #0284c7;">
+            <i data-lucide="image" style="width: 16px; height: 16px;"></i> JPG Output
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Resolution / Quality</label>
+          <select class="form-select" id="img-scale-select">
+            <option value="1.0" ${opts.imgScale === 1.0 ? 'selected' : ''}>Standard (1x - Fast)</option>
+            <option value="1.5" ${opts.imgScale === 1.5 ? 'selected' : ''}>High Definition (1.5x - Recommended)</option>
+            <option value="2.0" ${opts.imgScale === 2.0 ? 'selected' : ''}>Ultra HD (2x - Crisp Diagrams)</option>
+          </select>
+        </div>
+      `;
+
+    case 'pdf-to-png':
+      return `
+        <div class="form-group">
+          <label class="form-label">Image Format</label>
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 2px solid #10b981; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.1); font-weight: 700; font-size: 0.85rem; color: #10b981;">
+            <i data-lucide="file-image" style="width: 16px; height: 16px;"></i> PNG Output
           </div>
         </div>
 
@@ -1680,12 +1713,11 @@ async function executeTool() {
         break;
 
       case 'pdf-to-jpg':
-        result = await pdfToImages(
-          file,
-          state.toolOptions.imgFormat,
-          state.toolOptions.imgScale,
-          onProgress
-        );
+        result = await pdfToImages(file, 'jpg', state.toolOptions.imgScale, onProgress);
+        break;
+
+      case 'pdf-to-png':
+        result = await pdfToImages(file, 'png', state.toolOptions.imgScale, onProgress);
         break;
 
       case 'jpg-to-pdf':
@@ -2093,6 +2125,77 @@ function attachStudioListeners() {
     });
   });
 
+  // Organize: reorder page (move earlier / later)
+  function movePage(fromIdx, toIdx) {
+    if (
+      fromIdx === toIdx ||
+      fromIdx < 0 ||
+      toIdx < 0 ||
+      fromIdx >= state.thumbnails.length ||
+      toIdx >= state.thumbnails.length
+    ) {
+      return;
+    }
+    const [movedThumb] = state.thumbnails.splice(fromIdx, 1);
+    state.thumbnails.splice(toIdx, 0, movedThumb);
+    const [movedPage] = state.toolOptions.pageOrder.splice(fromIdx, 1);
+    state.toolOptions.pageOrder.splice(toIdx, 0, movedPage);
+    renderApp();
+  }
+
+  document.querySelectorAll('[data-move-page-up]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-move-page-up'), 10);
+      movePage(idx, idx - 1);
+    });
+  });
+
+  document.querySelectorAll('[data-move-page-down]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-move-page-down'), 10);
+      movePage(idx, idx + 1);
+    });
+  });
+
+  // Organize: drag & drop to reorder pages
+  if (state.activeToolId === 'organize') {
+    let dragSrcIdx = null;
+    document.querySelectorAll('.thumbnail-item[draggable="true"]').forEach((el) => {
+      el.addEventListener('dragstart', (e) => {
+        dragSrcIdx = parseInt(el.getAttribute('data-thumb-idx'), 10);
+        el.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(dragSrcIdx));
+      });
+
+      el.addEventListener('dragend', () => {
+        el.classList.remove('dragging');
+        document.querySelectorAll('.thumbnail-item.drag-over-target').forEach((t) => {
+          t.classList.remove('drag-over-target');
+        });
+        dragSrcIdx = null;
+      });
+
+      el.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        el.classList.add('drag-over-target');
+      });
+
+      el.addEventListener('dragleave', () => {
+        el.classList.remove('drag-over-target');
+      });
+
+      el.addEventListener('drop', (e) => {
+        e.preventDefault();
+        el.classList.remove('drag-over-target');
+        const targetIdx = parseInt(el.getAttribute('data-thumb-idx'), 10);
+        const srcIdx = dragSrcIdx !== null ? dragSrcIdx : parseInt(e.dataTransfer.getData('text/plain'), 10);
+        movePage(srcIdx, targetIdx);
+      });
+    });
+  }
+
   // Generic option set buttons (data-set-opt)
   document.querySelectorAll('[data-set-opt]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -2186,6 +2289,13 @@ function attachStudioListeners() {
   if (pageNumPos) {
     pageNumPos.addEventListener('change', (e) => {
       state.toolOptions.pageNumberPosition = e.target.value;
+    });
+  }
+
+  const imgScaleSelect = document.getElementById('img-scale-select');
+  if (imgScaleSelect) {
+    imgScaleSelect.addEventListener('change', (e) => {
+      state.toolOptions.imgScale = parseFloat(e.target.value);
     });
   }
 
