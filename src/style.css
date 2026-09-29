@@ -589,7 +589,7 @@ input, select, textarea {
 
 .hero-section {
   text-align: center;
-  padding: 56px 20px 36px;
+  padding: 76px 20px 44px;
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -795,7 +795,7 @@ input, select, textarea {
 /* Category Filter Tabs with Horizontal Scroll Wrapper */
 .category-tabs-wrapper {
   max-width: 100%;
-  margin: 0 auto 36px;
+  margin: 0 auto 56px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -878,7 +878,7 @@ input, select, textarea {
 .section-subheading-group {
   text-align: center;
   max-width: 680px;
-  margin: 0 auto 32px;
+  margin: 0 auto 44px;
 }
 
 .section-eyebrow {
@@ -888,24 +888,76 @@ input, select, textarea {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent-gold);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   background: rgba(220, 189, 84, 0.14);
-  padding: 4px 14px;
+  padding: 5px 16px;
   border-radius: var(--radius-full);
 }
 
 .section-main-heading {
-  font-size: 1.85rem;
+  font-size: 2.05rem;
   font-weight: 800;
   color: var(--text-main);
   letter-spacing: -0.025em;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .section-desc {
-  font-size: 0.96rem;
+  font-size: 0.98rem;
   color: var(--text-muted);
-  line-height: 1.55;
+  line-height: 1.6;
+}
+
+/* Shared inner container for full-bleed banded sections */
+.section-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 88px 28px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .section-inner {
+    padding: 56px 20px;
+  }
+}
+
+/* Flex header row used by compact section headers (e.g. Popular Workflows) */
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.section-header-row-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title-md {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.section-tag-pill {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .section-tag-pill {
+  color: var(--accent-gold);
+  background: rgba(220, 189, 84, 0.14);
 }
 
 /* ==========================================================================
@@ -913,10 +965,10 @@ input, select, textarea {
    ========================================================================== */
 
 .popular-workflows-section {
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: 0 28px 48px;
   width: 100%;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .popular-workflows-grid {
@@ -1018,24 +1070,36 @@ input, select, textarea {
 .tools-grid-section {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 0 28px 80px;
+  padding: 80px 28px;
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .tools-grid-section {
+    padding: 56px 20px;
+  }
 }
 
 .tools-grid-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   flex-wrap: wrap;
   gap: 12px;
 }
 
-.tools-grid-header h3 {
-  font-size: 1.35rem;
+.tools-grid-title {
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-main);
   letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.tools-grid-subtitle {
+  font-size: 0.92rem;
+  color: var(--text-muted);
 }
 
 .tools-count-pill {
@@ -1126,6 +1190,11 @@ input, select, textarea {
   background: var(--bg-subtle);
   color: var(--text-muted);
   border: 1px solid var(--border-subtle);
+  max-width: 108px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tool-badge {
@@ -1178,6 +1247,7 @@ input, select, textarea {
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
   transition: gap var(--transition-fast);
 }
 
@@ -1246,10 +1316,10 @@ input, select, textarea {
    ========================================================================== */
 
 .features-showcase-section {
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: 40px 28px 60px;
   width: 100%;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .features-grid {
@@ -1329,8 +1399,14 @@ input, select, textarea {
 .steps-section {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 20px 28px 70px;
+  padding: 88px 28px;
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .steps-section {
+    padding: 56px 20px;
+  }
 }
 
 .steps-grid {

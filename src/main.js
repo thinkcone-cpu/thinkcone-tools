@@ -518,12 +518,13 @@ function renderHomeView() {
       isBrowsingAll
         ? `
       <section class="popular-workflows-section">
-        <div class="section-header-compact">
-          <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="section-inner">
+        <div class="section-header-row">
+          <div class="section-header-row-title">
             <i data-lucide="flame" style="width: 20px; height: 20px; color: var(--accent-gold);"></i>
-            <h2 class="section-title-compact">Most Popular Workflows</h2>
+            <h2 class="section-title-md">Most Popular Workflows</h2>
           </div>
-          <span class="section-tag-compact">Instant 1-Click Launch</span>
+          <span class="section-tag-pill">Instant 1-Click Launch</span>
         </div>
 
         <div class="popular-workflows-grid">
@@ -582,6 +583,7 @@ function renderHomeView() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </section>
       `
@@ -659,14 +661,11 @@ function renderHomeView() {
 
     <!-- Why Thinkcone Tools Feature Showcase Section -->
     <section class="features-showcase-section">
-      <div class="features-header">
-        <div class="hero-brand-card" style="margin-bottom: 12px; padding: 5px 14px;">
-          <div class="hero-brand-card-text" style="font-size: 0.8rem;">
-            <span>WHY THINKCONE TOOLS</span>
-          </div>
-        </div>
-        <h2 class="features-main-title">Engineered for Absolute Privacy & High-Speed Productivity</h2>
-        <p class="features-main-desc">
+      <div class="section-inner">
+      <div class="section-subheading-group">
+        <span class="section-eyebrow">Why Thinkcone Tools</span>
+        <h2 class="section-main-heading">Engineered for Absolute Privacy & High-Speed Productivity</h2>
+        <p class="section-desc">
           No cloud uploads. No registration barriers. All tools run 100% locally in your browser memory with professional precision.
         </p>
       </div>
@@ -711,13 +710,15 @@ function renderHomeView() {
           </div>
         </div>
       </div>
+      </div>
     </section>
 
     <!-- 3-Step Workflow Guide -->
     <section class="steps-section">
-      <div class="steps-header">
-        <h2 style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">Simple 3-Step Workflow</h2>
-        <p style="color: var(--text-muted); font-size: 0.95rem;">Process any document or image in under 5 seconds.</p>
+      <div class="section-subheading-group">
+        <span class="section-eyebrow">How It Works</span>
+        <h2 class="section-main-heading">Simple 3-Step Workflow</h2>
+        <p class="section-desc">Process any document or image in under 5 seconds.</p>
       </div>
 
       <div class="steps-grid">
