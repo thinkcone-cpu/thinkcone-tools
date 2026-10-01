@@ -21,8 +21,10 @@ import {
   unlockPdf,
   convertPngToJpg,
   convertJpgToPng,
+  applyPdfEdits,
   downloadFile,
 } from './pdfEngine.js';
+import { PdfEditor } from './pdfEditor.js';
 
 // Application State
 const state = {
@@ -76,6 +78,8 @@ const state = {
     // png-to-jpg & jpg-to-png
     pngQuality: 0.92,
     pngBgColor: '#ffffff',
+    // edit-pdf (Sejda-style PDF Editor)
+    editorPagesEdits: {},
   },
 
   // Navigation Drawers
@@ -180,6 +184,11 @@ function renderApp() {
 
         <!-- Desktop & Laptop Navigation Bar -->
         <nav class="header-nav">
+          <a class="nav-link ${state.activeToolId === 'edit-pdf' ? 'active' : ''}" data-nav-tool="edit-pdf">
+            <span style="display: inline-flex; align-items: center; gap: 4px;">
+              <span style="color: var(--accent-gold); font-size: 0.9em;">★</span> PDF Editor
+            </span>
+          </a>
           <a class="nav-link ${state.activeToolId === 'merge' ? 'active' : ''}" data-nav-tool="merge">Merge PDF</a>
           <a class="nav-link ${state.activeToolId === 'split' ? 'active' : ''}" data-nav-tool="split">Split PDF</a>
           <a class="nav-link ${state.activeToolId === 'compress' ? 'active' : ''}" data-nav-tool="compress">Compress PDF</a>
@@ -218,6 +227,10 @@ function renderApp() {
       <div class="mobile-nav-body">
         <div class="mobile-nav-section-title">Popular Tools</div>
         <div class="mobile-nav-links">
+          <a class="mobile-nav-item ${state.activeToolId === 'edit-pdf' ? 'active' : ''}" data-mobile-tool="edit-pdf">
+            <i data-lucide="file-edit" style="width: 18px; height: 18px; color: var(--accent-gold);"></i>
+            <span>PDF Editor (Sejda-Style)</span>
+          </a>
           <a class="mobile-nav-item ${state.activeToolId === 'merge' ? 'active' : ''}" data-mobile-tool="merge">
             <i data-lucide="layers" style="width: 18px; height: 18px; color: #005043;"></i>
             <span>Merge PDF</span>
@@ -327,6 +340,7 @@ function renderApp() {
 
           <div class="footer-col">
             <h4>Security & Free Access</h4>
+            <a class="footer-link" data-footer-tool="edit-pdf" style="color: var(--accent-gold); font-weight: 700;">PDF Editor (Sejda-Style)</a>
             <a class="footer-link" data-footer-tool="watermark">Watermark PDF</a>
             <a class="footer-link" data-footer-tool="page-numbers">Page Numbers</a>
             <a class="footer-link" data-footer-tool="protect">Protect with Password</a>
@@ -749,9 +763,11 @@ function renderToolStudioView() {
   const tool = TOOLS.find((t) => t.id === state.activeToolId);
   if (!tool) return '<div>Tool not found</div>';
 
+  const isEditor = tool.id === 'edit-pdf' && state.selectedFiles.length > 0 && !state.result && !state.isProcessing;
+
   return `
-    <div class="tool-studio">
-      <div class="studio-header">
+    <div class="tool-studio ${isEditor ? 'editor-full-studio' : ''}">
+      <div class="studio-header" ${isEditor ? 'style="display: none;"' : ''}>
         <div class="studio-title-area">
           <button class="back-btn" id="studio-back-btn">
             <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
@@ -771,16 +787,22 @@ function renderToolStudioView() {
         </div>
       </div>
 
-      <div class="studio-layout">
+      <div class="studio-layout ${isEditor ? 'editor-full-mode' : ''}" style="${isEditor ? 'grid-template-columns: 1fr; gap: 0;' : ''}">
         <!-- Interactive Stage -->
-        <div class="studio-stage" id="studio-stage-container">
+        <div class="studio-stage ${isEditor ? 'editor-stage-full' : ''}" id="studio-stage-container" style="${isEditor ? 'padding: 0; background: transparent; border: none; box-shadow: none;' : ''}">
           ${renderStudioStageContent(tool)}
         </div>
 
-        <!-- Sidebar Configuration Options -->
-        <div class="studio-sidebar" id="studio-sidebar-container">
-          ${renderStudioSidebarContent(tool)}
-        </div>
+        <!-- Sidebar Configuration Options (Hidden in editor mode since editor has its own top ribbon) -->
+        ${
+          !isEditor
+            ? `
+          <div class="studio-sidebar" id="studio-sidebar-container">
+            ${renderStudioSidebarContent(tool)}
+          </div>
+        `
+            : ''
+        }
       </div>
     </div>
   `;
@@ -1090,7 +1112,14 @@ function renderStudioStageContent(tool) {
     `;
   }
 
-  // Case C: Single PDF or Images with thumbnails
+  // Case C: Interactive PDF Editor (Sejda-Style)
+  if (tool.id === 'edit-pdf') {
+    return `
+      <div id="interactive-pdf-editor-container" style="width: 100%;"></div>
+    `;
+  }
+
+  // Case D: Single PDF or Images with thumbnails
   const firstFile = state.selectedFiles[0];
   return `
     <div class="stage-preview-header">
@@ -1199,6 +1228,29 @@ function renderStudioSidebarContent(tool) {
  */
 function renderToolSpecificControls(tool, opts) {
   switch (tool.id) {
+    case 'edit-pdf':
+      return `
+        <div class="form-group">
+          <span class="form-label">Full Interactive Editor</span>
+          <p class="form-sublabel">Edit your document directly on the interactive canvas with Sejda-style power:</p>
+          <ul style="font-size: 0.82rem; color: var(--text-muted); padding-left: 18px; margin-top: 8px; line-height: 1.6;">
+            <li><strong>Text:</strong> Click anywhere on page to type</li>
+            <li><strong>Whiteout:</strong> Drag to erase/redact text</li>
+            <li><strong>Draw:</strong> Freehand pencil annotations</li>
+            <li><strong>Sign:</strong> Draw, type cursive, or upload</li>
+            <li><strong>Shapes:</strong> Rectangles, circles, lines</li>
+            <li><strong>Highlight:</strong> Semi-transparent marker</li>
+            <li><strong>Forms:</strong> Checkmarks, crosses, boxes</li>
+            <li><strong>Images:</strong> Insert pictures and logos</li>
+          </ul>
+        </div>
+        <div class="form-group" style="margin-top: 10px;">
+          <div style="background: var(--bg-subtle); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); font-size: 0.8rem; color: var(--text-main);">
+            <strong style="color: var(--primary);">Vector Native Embedding:</strong> All edits are baked directly into the native PDF layer when you click <strong>Apply Changes</strong>!
+          </div>
+        </div>
+      `;
+
     case 'merge':
       return `
         <div class="form-group">
@@ -1681,6 +1733,14 @@ async function executeTool() {
     const file = state.selectedFiles[0];
 
     switch (tool.id) {
+      case 'edit-pdf':
+        result = await applyPdfEdits(
+          file,
+          state.toolOptions.editorPagesEdits || {},
+          onProgress
+        );
+        break;
+
       case 'merge':
         result = await mergePdfs(state.selectedFiles, onProgress);
         break;
@@ -2302,6 +2362,20 @@ function attachStudioListeners() {
 
   // Execute Action Button
   document.getElementById('execute-tool-action-btn')?.addEventListener('click', executeTool);
+
+  // Initialize PDF Editor (Sejda-Style) if active
+  const editorContainer = document.getElementById('interactive-pdf-editor-container');
+  if (editorContainer && state.activeToolId === 'edit-pdf' && state.selectedFiles[0] && !state.result && !state.isProcessing) {
+    new PdfEditor(editorContainer, state.selectedFiles[0], {
+      onApplyChanges: (pagesEdits) => {
+        state.toolOptions.editorPagesEdits = pagesEdits;
+        executeTool();
+      },
+      onBack: () => {
+        goHome();
+      },
+    });
+  }
 
   // Result actions
   document.getElementById('result-download-btn')?.addEventListener('click', () => {

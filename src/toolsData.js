@@ -15,6 +15,20 @@ export const TOOL_CATEGORIES = [
 
 export const TOOLS = [
   {
+    id: 'edit-pdf',
+    name: 'PDF Editor',
+    category: 'security',
+    badge: 'Interactive',
+    icon: 'FileEdit',
+    color: '#005043',
+    bgColor: 'rgba(0, 80, 67, 0.1)',
+    shortDesc: 'Edit PDF text, add signatures, whiteout content, draw annotations, and add shapes & images.',
+    detailedDesc: 'Interactive full-featured PDF editor like Sejda. Add or edit text, whiteout areas, sign documents, draw annotations, and add images.',
+    accept: '.pdf',
+    multiple: false,
+    actionButtonText: 'Apply Changes',
+  },
+  {
     id: 'merge',
     name: 'Merge PDF',
     category: 'organize',

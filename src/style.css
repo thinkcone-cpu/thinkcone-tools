@@ -2893,3 +2893,1048 @@ input, select, textarea {
   }
 }
 
+/* ==========================================================================
+   Thinkcone PDF Editor Studio (Sejda-Style Interactive Editor)
+   ========================================================================== */
+
+.pdf-editor-workspace {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  margin-top: 10px;
+  min-height: 820px;
+  position: relative;
+}
+
+/* 1. Top Ribbon Navigation & Primary Tools */
+.editor-top-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ribbon-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.editor-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.editor-btn-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.editor-doc-meta {
+  display: flex;
+  flex-direction: column;
+  max-width: 220px;
+}
+
+.editor-doc-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editor-page-counter {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Central Tool Buttons */
+.ribbon-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.editor-tool-group {
+  display: flex;
+  align-items: center;
+  background: var(--bg-subtle);
+  padding: 4px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  gap: 3px;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.tool-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-hover);
+}
+
+.tool-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+[data-theme='dark'] .tool-btn.active {
+  background: var(--accent-gold);
+  color: #04221c;
+  box-shadow: 0 2px 8px var(--gold-glow);
+}
+
+/* Ribbon Right (History, Zoom, Apply) */
+.ribbon-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editor-action-group {
+  display: flex;
+  align-items: center;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 2px;
+}
+
+.icon-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.icon-tool-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.icon-tool-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.zoom-group {
+  gap: 4px;
+}
+
+.zoom-level-text {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 42px;
+  text-align: center;
+}
+
+.editor-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  background: var(--primary-gradient);
+  border: 1px solid var(--primary);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.editor-apply-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+/* 2. Sub-Ribbon (Context controls) */
+.editor-sub-ribbon {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 8px 18px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 53px;
+  z-index: 35;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.sub-ribbon-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.control-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sub-select {
+  padding: 4px 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.sub-toggle-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.sub-toggle-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.sub-color-input {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: transparent;
+}
+
+.color-presets {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+  border: 2px solid transparent;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch.active {
+  border-color: var(--text-main);
+  box-shadow: 0 0 0 1px #ffffff;
+}
+
+.sub-pill-selector {
+  display: flex;
+  align-items: center;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  gap: 2px;
+}
+
+.sub-pill {
+  padding: 3px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sub-pill.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-sub-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-sub-primary:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.signature-active-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-subtle);
+  padding: 3px 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.signature-active-preview img {
+  height: 24px;
+  width: auto;
+  max-width: 100px;
+}
+
+.active-badge {
+  font-size: 0.72rem;
+  color: var(--accent-green);
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+.sub-ribbon-tip {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+/* 3. Document Viewport & Pages */
+.editor-pages-scroll-area {
+  flex: 1;
+  background: var(--bg-page);
+  padding: 36px 16px 60px;
+  overflow-y: auto;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.editor-pages-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  width: 100%;
+}
+
+.editor-loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.editor-page-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-surface);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  transition: transform var(--transition-fast);
+}
+
+.editor-page-card-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-subtle);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.editor-page-number-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.editor-page-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.editor-page-clear-btn:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.editor-page-viewport {
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.editor-page-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.editor-drawing-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.editor-annotation-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* 4. Annotations Items */
+.editor-annotation-item {
+  position: absolute;
+  cursor: move;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.editor-annotation-item.selected {
+  outline: 1.5px dashed var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 80, 67, 0.15);
+}
+
+.annotation-action-bar {
+  position: absolute;
+  top: -24px;
+  right: -2px;
+  display: none;
+  align-items: center;
+  gap: 3px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 1px 3px;
+  box-shadow: var(--shadow-sm);
+  z-index: 50;
+}
+
+.editor-annotation-item.selected .annotation-action-bar,
+.editor-annotation-item:hover .annotation-action-bar {
+  display: flex;
+}
+
+.annotation-del-btn {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.annotation-del-btn:hover {
+  background: #fee2e2;
+}
+
+.annotation-resize-handle {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  cursor: nwse-resize;
+  display: none;
+  z-index: 50;
+}
+
+.editor-annotation-item.selected .annotation-resize-handle {
+  display: block;
+}
+
+/* Specific Annotation Types */
+.item-text {
+  min-width: 60px;
+  min-height: 24px;
+}
+
+.text-content-box {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  cursor: text;
+  line-height: 1.25;
+  white-space: pre-wrap;
+  word-break: break-word;
+  user-select: text;
+  padding: 2px 4px;
+}
+
+.item-whiteout {
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+}
+
+.item-whiteout .whiteout-fill {
+  width: 100%;
+  height: 100%;
+}
+
+.item-highlight {
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+.box-creation-preview {
+  position: absolute;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* 5. Signature Modal (Sejda-Style) */
+.signature-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.signature-modal-dialog {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.signature-modal-dialog .modal-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-title-row h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.modal-close-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.signature-modal-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
+}
+
+.sig-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.sig-tab:hover {
+  color: var(--text-main);
+}
+
+.sig-tab.active {
+  color: var(--primary);
+  background: var(--bg-surface);
+  border-bottom-color: var(--primary);
+}
+
+[data-theme='dark'] .sig-tab.active {
+  color: var(--accent-gold);
+  border-bottom-color: var(--accent-gold);
+}
+
+.signature-modal-dialog .modal-body {
+  padding: 22px 20px;
+}
+
+.sig-tab-panel {
+  display: none;
+}
+
+.sig-tab-panel.active {
+  display: block;
+}
+
+/* Tab 1: Draw Pad */
+.sig-pad-wrapper {
+  position: relative;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+#sig-draw-canvas {
+  cursor: crosshair;
+  touch-action: none;
+  background: #ffffff;
+}
+
+.sig-pad-baseline {
+  position: absolute;
+  bottom: 35px;
+  left: 20px;
+  right: 20px;
+  border-bottom: 1px dashed #cbd5e1;
+  pointer-events: none;
+}
+
+.sig-pad-clear-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 10px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #475569;
+}
+
+.sig-pad-clear-btn:hover {
+  background: #e2e8f0;
+}
+
+.sig-pad-colors {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.sig-color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.sig-color-dot.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+/* Tab 2: Type Cursive */
+.sig-type-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  outline: none;
+  font-family: inherit;
+}
+
+.sig-type-input:focus {
+  border-color: var(--primary);
+  background: var(--bg-surface);
+}
+
+.sig-type-styles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.sig-style-card {
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px 12px;
+  background: var(--bg-surface);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+}
+
+.sig-style-card:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-subtle);
+}
+
+.sig-style-card.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.sig-style-preview {
+  font-size: 1.8rem;
+  color: var(--primary);
+  line-height: 1.2;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-dancing {
+  font-family: 'Dancing Script', cursive;
+}
+
+.preview-caveat {
+  font-family: 'Caveat', cursive;
+}
+
+.sig-style-name {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Tab 3: Upload Image */
+.sig-upload-dropzone {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 36px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: var(--bg-subtle);
+  text-align: center;
+}
+
+.sig-upload-dropzone:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.sig-upload-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.sig-upload-preview img {
+  max-height: 90px;
+  width: auto;
+}
+
+.btn-sub-text {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.signature-modal-dialog .modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: var(--bg-surface);
+}
+
+/* Responsive PDF Editor Workspace */
+@media (max-width: 768px) {
+  .editor-top-ribbon {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .ribbon-left, .ribbon-center, .ribbon-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .editor-tool-group {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .tool-btn span {
+    display: none;
+  }
+
+  .tool-btn {
+    padding: 8px;
+  }
+
+  .editor-sub-ribbon {
+    top: 108px;
+  }
+
+  .sub-ribbon-tip {
+    display: none;
+  }
+
+  .sig-type-styles {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Adobe Acrobat / Sejda Style In-Place Existing Text Editing Overlay
+   ========================================================================== */
+
+.editor-existing-text-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.editor-existing-text-layer.text-mode-active {
+  z-index: 22;
+  pointer-events: none;
+}
+
+.existing-pdf-text-item {
+  position: absolute;
+  cursor: text;
+  border-radius: 4px;
+  background: transparent;
+  transition: all 140ms ease;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.existing-pdf-text-item:hover {
+  outline: 1.5px dashed #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.18);
+}
+
+[data-theme='dark'] .existing-pdf-text-item:hover {
+  outline-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.18);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.existing-pdf-text-item::after {
+  content: '✎ Click to edit text';
+  position: absolute;
+  top: -24px;
+  left: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: #2563eb;
+  padding: 2px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 140ms ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 60;
+}
+
+[data-theme='dark'] .existing-pdf-text-item::after {
+  background: #0284c7;
+}
+
+.existing-pdf-text-item:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.acrobat-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: var(--radius-full);
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .acrobat-mode-pill {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+}

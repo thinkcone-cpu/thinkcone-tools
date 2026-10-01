@@ -1072,3 +1072,284 @@ export async function createSampleImage(format = 'png') {
   return new File([blob], `sample-graphic.${format}`, { type: mime });
 }
 
+/**
+ * Convert Data URL to Uint8Array
+ */
+function dataUrlToUint8Array(dataUrl) {
+  const parts = dataUrl.split(',');
+  const base64 = parts[1] || parts[0];
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+/**
+ * APPLY PDF EDITS (Sejda-style PDF Editor Engine)
+ * Takes original PDF file and user annotations across pages,
+ * embeds fonts, whiteout rectangles, signatures, freehand drawings,
+ * text, shapes, highlights, and checkmarks into native PDF vectors.
+ */
+export async function applyPdfEdits(file, pagesEdits, onProgress) {
+  if (onProgress) onProgress(15, 'Loading original document...');
+  const buffer = await readFileAsArrayBuffer(file);
+  const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
+
+  if (onProgress) onProgress(30, 'Embedding standard fonts...');
+  const fonts = {
+    helvetica: await pdfDoc.embedFont(StandardFonts.Helvetica),
+    helveticaBold: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
+    helveticaOblique: await pdfDoc.embedFont(StandardFonts.HelveticaOblique),
+    helveticaBoldOblique: await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique),
+    times: await pdfDoc.embedFont(StandardFonts.TimesRoman),
+    timesBold: await pdfDoc.embedFont(StandardFonts.TimesRomanBold),
+    timesItalic: await pdfDoc.embedFont(StandardFonts.TimesRomanItalic),
+    timesBoldItalic: await pdfDoc.embedFont(StandardFonts.TimesRomanBoldItalic),
+    courier: await pdfDoc.embedFont(StandardFonts.Courier),
+    courierBold: await pdfDoc.embedFont(StandardFonts.CourierBold),
+    courierOblique: await pdfDoc.embedFont(StandardFonts.CourierOblique),
+    courierBoldOblique: await pdfDoc.embedFont(StandardFonts.CourierBoldOblique),
+  };
+
+  const totalPages = pdfDoc.getPageCount();
+
+  for (let i = 0; i < totalPages; i++) {
+    const pageIndex = i;
+    const pageData = pagesEdits[pageIndex];
+    if (!pageData || !pageData.edits || pageData.edits.length === 0) continue;
+
+    const page = pdfDoc.getPage(pageIndex);
+    const { width: pdfWidth, height: pdfHeight } = page.getSize();
+    const viewportWidth = pageData.viewportWidth || pdfWidth;
+    const viewportHeight = pageData.viewportHeight || pdfHeight;
+    const scaleX = pdfWidth / viewportWidth;
+    const scaleY = pdfHeight / viewportHeight;
+
+    if (onProgress) {
+      const pct = Math.round(30 + ((i + 1) / totalPages) * 55);
+      onProgress(pct, `Applying edits to page ${i + 1} of ${totalPages}...`);
+    }
+
+    for (const edit of pageData.edits) {
+      try {
+        switch (edit.type) {
+          case 'whiteout': {
+            const x = edit.x * scaleX;
+            const w = edit.width * scaleX;
+            const h = edit.height * scaleY;
+            const y = pdfHeight - (edit.y * scaleY) - h;
+            page.drawRectangle({
+              x,
+              y,
+              width: Math.max(1, w),
+              height: Math.max(1, h),
+              color: hexToRgb(edit.color || '#ffffff'),
+            });
+            break;
+          }
+
+          case 'highlight': {
+            const x = edit.x * scaleX;
+            const w = edit.width * scaleX;
+            const h = edit.height * scaleY;
+            const y = pdfHeight - (edit.y * scaleY) - h;
+            page.drawRectangle({
+              x,
+              y,
+              width: Math.max(1, w),
+              height: Math.max(1, h),
+              color: hexToRgb(edit.color || '#fef08a'),
+              opacity: edit.opacity || 0.45,
+            });
+            break;
+          }
+
+          case 'shape': {
+            const x = edit.x * scaleX;
+            const w = edit.width * scaleX;
+            const h = edit.height * scaleY;
+            const y = pdfHeight - (edit.y * scaleY) - h;
+            const strokeW = (edit.strokeWidth || 2) * scaleX;
+            const strokeColor = edit.strokeColor && edit.strokeColor !== 'transparent' ? hexToRgb(edit.strokeColor) : undefined;
+            const fillColor = edit.fillColor && edit.fillColor !== 'transparent' ? hexToRgb(edit.fillColor) : undefined;
+
+            if (edit.shapeType === 'circle') {
+              const xCenter = x + w / 2;
+              const yCenter = y + h / 2;
+              page.drawEllipse({
+                x: xCenter,
+                y: yCenter,
+                xScale: Math.max(1, w / 2),
+                yScale: Math.max(1, h / 2),
+                borderWidth: strokeColor ? strokeW : 0,
+                borderColor: strokeColor,
+                color: fillColor,
+              });
+            } else if (edit.shapeType === 'line') {
+              page.drawLine({
+                start: { x: edit.x * scaleX, y: pdfHeight - (edit.y * scaleY) },
+                end: { x: (edit.x + edit.width) * scaleX, y: pdfHeight - ((edit.y + edit.height) * scaleY) },
+                thickness: strokeW,
+                color: strokeColor || hexToRgb('#000000'),
+              });
+            } else {
+              // rectangle
+              page.drawRectangle({
+                x,
+                y,
+                width: Math.max(1, w),
+                height: Math.max(1, h),
+                borderWidth: strokeColor ? strokeW : 0,
+                borderColor: strokeColor,
+                color: fillColor,
+              });
+            }
+            break;
+          }
+
+          case 'text': {
+            let fontToUse = fonts.helvetica;
+            const family = (edit.fontFamily || 'helvetica').toLowerCase();
+            const bold = Boolean(edit.isBold);
+            const italic = Boolean(edit.isItalic);
+
+            if (family.includes('times')) {
+              fontToUse = bold && italic ? fonts.timesBoldItalic : bold ? fonts.timesBold : italic ? fonts.timesItalic : fonts.times;
+            } else if (family.includes('courier')) {
+              fontToUse = bold && italic ? fonts.courierBoldOblique : bold ? fonts.courierBold : italic ? fonts.courierOblique : fonts.courier;
+            } else {
+              fontToUse = bold && italic ? fonts.helveticaBoldOblique : bold ? fonts.helveticaBold : italic ? fonts.helveticaOblique : fonts.helvetica;
+            }
+
+            const fontSizePdf = (edit.fontSize || 16) * scaleY;
+            const textColor = hexToRgb(edit.fontColor || '#000000');
+            const textX = edit.x * scaleX;
+            const lines = (edit.text || '').split('\n');
+            const lineHeight = fontSizePdf * 1.25;
+
+            lines.forEach((lineText, lineIdx) => {
+              if (lineText.length === 0) return;
+              const textBaselineY = pdfHeight - (edit.y * scaleY) - (fontSizePdf * 0.85) - (lineIdx * lineHeight);
+              page.drawText(lineText, {
+                x: textX,
+                y: textBaselineY,
+                size: fontSizePdf,
+                font: fontToUse,
+                color: textColor,
+              });
+            });
+            break;
+          }
+
+          case 'draw': {
+            const points = edit.points || [];
+            if (points.length < 2) break;
+            const strokeW = (edit.strokeWidth || 2) * scaleX;
+            const strokeColor = hexToRgb(edit.strokeColor || '#000000');
+
+            for (let p = 0; p < points.length - 1; p++) {
+              const p1 = points[p];
+              const p2 = points[p + 1];
+              page.drawLine({
+                start: { x: p1.x * scaleX, y: pdfHeight - (p1.y * scaleY) },
+                end: { x: p2.x * scaleX, y: pdfHeight - (p2.y * scaleY) },
+                thickness: strokeW,
+                color: strokeColor,
+              });
+            }
+            break;
+          }
+
+          case 'image':
+          case 'signature': {
+            if (!edit.dataUrl) break;
+            const isPng = edit.dataUrl.startsWith('data:image/png');
+            const imageBytes = dataUrlToUint8Array(edit.dataUrl);
+            const embeddedImage = isPng
+              ? await pdfDoc.embedPng(imageBytes)
+              : await pdfDoc.embedJpg(imageBytes);
+
+            const x = edit.x * scaleX;
+            const w = edit.width * scaleX;
+            const h = edit.height * scaleY;
+            const y = pdfHeight - (edit.y * scaleY) - h;
+
+            page.drawImage(embeddedImage, {
+              x,
+              y,
+              width: Math.max(1, w),
+              height: Math.max(1, h),
+            });
+            break;
+          }
+
+          case 'checkmark': {
+            const size = (edit.size || 24);
+            const w = size * scaleX;
+            const h = size * scaleY;
+            const x = edit.x * scaleX;
+            const y = pdfHeight - (edit.y * scaleY) - h;
+            const checkColor = hexToRgb(edit.color || '#005043');
+
+            if (edit.kind === 'check') {
+              page.drawLine({
+                start: { x: x + w * 0.15, y: y + h * 0.45 },
+                end: { x: x + w * 0.42, y: y + h * 0.15 },
+                thickness: 2.5 * scaleX,
+                color: checkColor,
+              });
+              page.drawLine({
+                start: { x: x + w * 0.42, y: y + h * 0.15 },
+                end: { x: x + w * 0.88, y: y + h * 0.88 },
+                thickness: 2.5 * scaleX,
+                color: checkColor,
+              });
+            } else if (edit.kind === 'cross') {
+              page.drawLine({
+                start: { x: x + w * 0.2, y: y + h * 0.2 },
+                end: { x: x + w * 0.8, y: y + h * 0.8 },
+                thickness: 2.5 * scaleX,
+                color: checkColor,
+              });
+              page.drawLine({
+                start: { x: x + w * 0.2, y: y + h * 0.8 },
+                end: { x: x + w * 0.8, y: y + h * 0.2 },
+                thickness: 2.5 * scaleX,
+                color: checkColor,
+              });
+            } else {
+              // box
+              page.drawRectangle({
+                x: x + w * 0.15,
+                y: y + h * 0.15,
+                width: w * 0.7,
+                height: h * 0.7,
+                borderWidth: 2 * scaleX,
+                borderColor: checkColor,
+              });
+            }
+            break;
+          }
+        }
+      } catch (err) {
+        console.warn('Error applying edit item to PDF page:', err);
+      }
+    }
+  }
+
+  if (onProgress) onProgress(90, 'Finalizing and compiling PDF...');
+  const editedPdfBytes = await pdfDoc.save();
+  if (onProgress) onProgress(100, 'Done!');
+
+  const origName = file.name ? file.name.replace(/\.pdf$/i, '') : 'document';
+  return {
+    filename: `${origName}_edited.pdf`,
+    data: editedPdfBytes,
+    type: 'pdf',
+    size: editedPdfBytes.byteLength,
+  };
+}
+
